@@ -16,8 +16,9 @@ import { useMutation, useQuery } from "convex/react";
 import { useConvex } from "convex/react";
 import { Minus, User } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Permissions from "./Permissions";
+import { showBar } from "../layout";
 
 interface Share {
   _id: Id<"Share">;
@@ -55,6 +56,8 @@ export function TabSection() {
   const [addedUsers, setAddedUsers] = useState<UserWithAddedId[]>([]);
   const [shareLoading, setShareLoading] = useState(true);
   const [addLoading, setAddLoading] = useState(true);
+  
+  const { value, setValue } = useContext(showBar);
 
   const handleDelete = async (id: Id<"Share">) => {
     try {
@@ -207,7 +210,7 @@ export function TabSection() {
               :
               <>
                 {addedUsers.map((user) => (
-                  <Link href={`/dashboard/${user.addedId}`} key={user._id}>
+                  <Link href={`/dashboard/${user.addedId}`} key={user._id} onClick={()=>{window.innerWidth <= 640 && setValue(false)}}>
                     <div className="border border-border rounded-md p-2 shadow-sm flex items-center justify-between truncate cursor-pointer">
                       <div className="flex items-center gap-4 truncate">
                         <Avatar className='w-10 h-10 overflow-hidden rounded-full'>

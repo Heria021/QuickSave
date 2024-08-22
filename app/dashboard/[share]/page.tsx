@@ -42,7 +42,7 @@ const Page = ({ params: { share } }: Props) => {
           <p>No Links</p>
         </div>
       ) : (
-        <div className={`grid gap-4 grid-cols-2 md:grid-cols-3 ${value ? 'lg:grid-cols-4' : 'lg:grid-cols-6'}`}>
+        <div className={`grid gap-4 grid-cols-1 md:grid-cols-3 ${value ? 'lg:grid-cols-4' : 'lg:grid-cols-5'}`}>
           {publinks.map((link: Link) => (
             <ShareCard
               key={link._id}
