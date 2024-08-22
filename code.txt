@@ -1,0 +1,227 @@
+'use client';
+import React, { useState } from 'react';
+import { Card } from '@/components/ui/card';
+import { api } from '@/convex/_generated/api';
+import { useMutation, useQuery } from 'convex/react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { CirclePlus, EditIcon, Plus, Trash2, icons } from 'lucide-react';
+import { Id } from '@/convex/_generated/dataModel';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { ConvexError } from 'convex/values';
+import { Input } from '@/components/ui/input';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { UserButton, UserProfile, useUser } from '@clerk/nextjs';
+import { ModeToggle } from '@/components/shared/Mode';
+import Home from '../page';
+
+interface Link {
+    _id: Id<"links">;
+    url: string;
+    note?: string;
+}
+
+const LinksPage = () => {
+    const allLinks = useQuery(api.linkSaver.get) || [];
+    const removeLink = useMutation(api.linkSaver.remove);
+    const updateLink = useMutation(api.linkSaver.update);
+
+    const [editingLink, setEditingLink] = useState<Link | null>(null);
+
+    const linkSchema = z.object({
+        url: z.string().url("Invalid URL").nonempty("URL is required"),
+        note: z.string().optional(),
+    });
+
+    const form = useForm<z.infer<typeof linkSchema>>({
+        resolver: zodResolver(linkSchema),
+        defaultValues: {
+            url: "",
+            note: "",
+        },
+    });
+
+    const { handleSubmit, formState: { errors }, reset, setValue } = form;
+
+    const onSubmit = async (values: z.infer<typeof linkSchema>) => {
+        try {
+            if (editingLink) {
+                await updateLink({ id: editingLink._id, url: values.url, note: values.note ?? '' });
+                toast.success("Link updated successfully");
+            } else {
+                // await createRequest(values);
+                toast.success("Link added successfully");
+            }
+            reset();
+            setEditingLink(null);
+        } catch (error: any) {
+            console.log(error);
+            toast.error(error instanceof ConvexError ? error.data : "Unexpected error occurred");
+        }
+    };
+
+    const handleEdit = (link: Link) => {
+        setEditingLink(link);
+        setValue("url", link.url);
+        setValue("note", link.note || "");
+    };
+
+    const handleDelete = async (id: Id<"links">) => {
+        try {
+            await removeLink({ id });
+        } catch (error) {
+            console.error('Error removing link:', error);
+        }
+    };
+
+    const user = useUser();
+
+    const Btn = Home;
+
+    return (
+        <div className="">
+            <div className="p-4">
+                <div className="">
+                    <Card className="flex items-center justify-between p-4">
+                        <div className="">
+                            <h1 className="text-4xl font-semibold tracking-wide text-gray-900">
+                                <span className="text-blue-600">Quick</span><span className="text-gray-900">Save</span>
+                            </h1>
+                        </div>
+                        <div className="">
+                            <div className="rounded-md flex items-center gap-2">
+                                {/* <Button variant="outline" size={'icon'} className="rounded-full p-2">
+                                    <div className="flex items-center justify-center gap-2">
+                                        <Plus size={20} strokeWidth={1.5} color="#000" />
+                                    </div>
+                                </Button> */}
+                                <Btn/>
+                                <div className="flex items-center gap-2">
+                                    <ModeToggle />
+                                    <div className="border-foreground h-[34px] border mx-4"></div>
+                                    <UserButton appearance={{
+                                        elements: {
+                                            userButtonAvatarBox: "w-[34px] h-[34px]",
+                                        }
+                                    }} />
+                                    <div className="">
+                                        <h1 className='text-xs font-semibold'>{user.user?.firstName}</h1>
+                                        <p className=' text-xs'>welcome back!</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Card>
+                </div>
+            </div>
+            <div className="p-4">
+                {allLinks.length === 0 ? (
+                    <p>No links available</p>
+                ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        {allLinks.map((link: Link) => (
+                            <Card key={link._id} className="p-4 border rounded shadow hover:shadow-lg">
+                                <div>
+                                    <div className="h-[40%] mb-1">
+                                        <img
+                                            src="http://www.gspireproductions.com/images/photo-yellow-light.png"
+                                            alt="Default preview"
+                                            className="mt-2 rounded-md"
+                                        />
+                                    </div>
+                                    <div className="">
+                                        <Link href={link.url}>
+                                            <div className="font-bold text-xs hover:underline cursor-pointer">{link.url}</div>
+                                        </Link>
+                                        {link.note && <p className="mt-2 text-sm text-gray-600">{link.note}</p>}
+                                    </div>
+                                    <div className="flex items-center justify-start gap-2 px-1 my-2">
+                                        <Dialog>
+                                            <DialogTrigger asChild>
+                                                <Button
+                                                    size={'icon'}
+                                                    className="h-7 w-7"
+                                                    onClick={() => handleEdit(link)}
+                                                >
+                                                    <EditIcon size={17} />
+                                                </Button>
+                                            </DialogTrigger>
+                                            <DialogContent className="sm:max-w-[425px]">
+                                                <DialogHeader>
+                                                    <DialogTitle>{editingLink ? "Edit URL Link" : "Add URL Link"}</DialogTitle>
+                                                    <DialogDescription>
+                                                        {editingLink ? "Edit the link details below and click save when you're done." : "Add a new link by filling out the form below and click save when you're done."}
+                                                    </DialogDescription>
+                                                </DialogHeader>
+
+                                                <Form {...form}>
+                                                    <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 py-4">
+                                                        <FormField
+                                                            control={form.control}
+                                                            name="url"
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormLabel>URL</FormLabel>
+                                                                    <FormControl>
+                                                                        <Input
+                                                                            id="url"
+                                                                            placeholder="https://example.com"
+                                                                            {...field}
+                                                                        />
+                                                                    </FormControl>
+                                                                    <FormMessage>
+                                                                        {errors.url && <p className="text-red-500">{errors.url.message}</p>}
+                                                                    </FormMessage>
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                        <FormField
+                                                            control={form.control}
+                                                            name="note"
+                                                            render={({ field }) => (
+                                                                <FormItem>
+                                                                    <FormLabel>Note</FormLabel>
+                                                                    <FormControl>
+                                                                        <Input
+                                                                            id="note"
+                                                                            placeholder="This link is about..."
+                                                                            {...field}
+                                                                        />
+                                                                    </FormControl>
+                                                                    <FormMessage>
+                                                                        {errors.note && <p className="text-red-500">{errors.note.message}</p>}
+                                                                    </FormMessage>
+                                                                </FormItem>
+                                                            )}
+                                                        />
+                                                        <DialogFooter>
+                                                            <Button type="submit" disabled={false}>Save Changes</Button>
+                                                        </DialogFooter>
+                                                    </form>
+                                                </Form>
+                                            </DialogContent>
+                                        </Dialog>
+
+                                        <Button
+                                            size={'icon'}
+                                            className="h-7 w-7"
+                                            onClick={() => handleDelete(link._id)}
+                                        >
+                                            <Trash2 size={17} />
+                                        </Button>
+                                    </div>
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default LinksPage;

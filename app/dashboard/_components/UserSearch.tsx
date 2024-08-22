@@ -1,0 +1,153 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Form, FormItem, FormLabel, FormControl } from '@/components/ui/form';
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
+import { useConvex } from 'convex/react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Plus, User } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { useMutationState } from '@/hooks/useMutationState';
+import { toast } from 'sonner';
+import { ConvexError } from 'convex/values';
+
+const searchSchema = z.object({
+  searchTerm: z.string().min(1, "Search term is required"),
+});
+
+type SearchFormValues = z.infer<typeof searchSchema>;
+
+interface User {
+  _id: Id<"users">;
+  _creationTime: number;
+  username: string;
+  imageUrl: string;
+  clerkId: string;
+  email: string;
+}
+
+export function UserSearch() {
+  const { mutate: createShare, pending } = useMutationState(api.ShareCollection.createShare);
+
+  const form = useForm<SearchFormValues>({
+    resolver: zodResolver(searchSchema),
+    defaultValues: {
+      searchTerm: "",
+    },
+  });
+
+  const { control, watch } = form;
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(false);
+  const searchTerm = watch('searchTerm');
+  const convex = useConvex();
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      if (!searchTerm) {
+        setUsers([]);
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        const result = await convex.query(api.userSearch.userSearch, { searchString: searchTerm });
+        setUsers(result ?? []);
+        console.log(result);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+      } finally {
+        if (searchTerm)
+          setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, [searchTerm, convex]);
+
+  const handleShare = async (r_email: string) => {
+    try {
+      await createShare({ r_email });
+      toast.success("Collection shared successfully");
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error instanceof ConvexError ? error.data : "Unexpected error occurred");
+    }
+  };
+
+  return (
+    <>
+      <Form {...form}>
+        <form className="grid gap-4 py-4" onSubmit={(e) => e.preventDefault()} >
+          <FormItem>
+            <FormLabel>Search Username or email</FormLabel>
+            <FormControl>
+              <Controller
+                name="searchTerm"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    id="searchTerm"
+                    placeholder="username or email"
+                    {...field}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                      }
+                    }}
+                  />
+                )}
+              />
+            </FormControl>
+          </FormItem>
+        </form>
+      </Form>
+      {loading && (
+        <div className="flex items-center space-x-4">
+          <Skeleton className="w-10 h-10 rounded-full" />
+          <Skeleton className="h-4 w-24 mb-1" />
+          <Skeleton className="h-3 w-32" />
+        </div>
+      )}
+      <div className="">
+        {users.length > 0 ? (
+          users.map((user) => (
+            <div key={user._id} className="flex items-center justify-between truncate mb-2">
+              <div key={user._id} className="flex items-center gap-4 truncate">
+                <Avatar className='w-10 h-10 overflow-hidden rounded-full'>
+                  <AvatarImage src={user.imageUrl} className='h-full w-full object-cover' />
+                  <AvatarFallback>
+                    <User size={24} />
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex flex-col truncate">
+                  <h4>{user.username}</h4>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {user.email}
+                  </p>
+                </div>
+              </div>
+              <div className="">
+                <Button onClick={() => handleShare(user.email)} className='h-8 w-8' variant={'outline'}>
+                  <div className="flex items-center justify-center">
+                    <Plus size={18} />
+                  </div>
+                </Button>
+              </div>
+            </div>
+          ))
+        ) : (
+          !loading && <p className='text-center'>No results found</p>
+        )}
+      </div>
+    </>
+  );
+}
