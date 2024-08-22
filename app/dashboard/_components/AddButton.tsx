@@ -14,6 +14,7 @@ import { useMutationState } from '@/hooks/useMutationState';
 import { fetchDiffbotData } from '@/lib/fetchDiffbotData';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
+import { useState } from 'react';
 
 interface Case {
   useCase: boolean;
@@ -31,6 +32,8 @@ export default function AddLink({ useCase }: Case) {
 
   const { mutate: createRequest, pending } = useMutationState(api.linkSaver.create);
 
+  const [loading, setLoading] = useState(false);
+
   const form = useForm<LinkFormValues>({
     resolver: zodResolver(linkSchema),
     defaultValues: {
@@ -44,6 +47,7 @@ export default function AddLink({ useCase }: Case) {
   const onSubmit = async (values: LinkFormValues) => {
     try {
       const data = await fetchDiffbotData(values.url);
+      setLoading(true)
       console.log('Fetched Data:', data);
 
       if (data) {
@@ -60,10 +64,12 @@ export default function AddLink({ useCase }: Case) {
         await createRequest(completeData)
           .then(() => {
             form.reset();
+            setLoading(false)
             toast.success("Link added successfully");
           })
           .catch((error: { data: any }) => {
             console.log(error);
+            setLoading(false)
             toast.error(error instanceof ConvexError ? error.data : "Unexpected error occurred");
           });
       }
@@ -161,7 +167,7 @@ export default function AddLink({ useCase }: Case) {
               )}
             />
             <DialogFooter>
-              <Button type="submit" disabled={pending}>Save Changes</Button>
+              <Button type="submit" disabled={pending || loading}>Save Changes</Button>
             </DialogFooter>
           </form>
         </Form>
