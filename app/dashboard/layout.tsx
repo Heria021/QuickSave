@@ -21,7 +21,7 @@ export default function RootLayout({
                     <div className={`flex-1 ${value ? 'md:block hidden' : 'flex-1'}`}>
                         {children}
                     </div>
-                    <div className={`flex items-center justify-center h-[80vh] ${value ? 'sm:w-[26vw] w-full' : 'hidden'}`}>
+                    <div className={`flex items-center justify-center h-[80vh] ${value ? 'md:w-[26vw] w-full' : 'hidden'}`}>
                         <TabSection />
                     </div>
                 </div>
