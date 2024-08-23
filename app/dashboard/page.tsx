@@ -30,7 +30,7 @@ const LinksPage = () => {
                     <AddLink useCase={false} />
                 </div>
             ) : (
-                <div className={`grid gap-4 grid-cols-1 md:grid-cols-3 ${value ? 'lg:grid-cols-4' : 'lg:grid-cols-5'}`}>
+                <div className={`grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 ${value ? 'lg:grid-cols-4' : 'lg:grid-cols-5'}`}>
                     {links.map((link: Link) => (
                         <LinkCard
                             key={link._id}
