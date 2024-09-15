@@ -611,10 +611,6 @@ video {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
 }
-.my-3 {
-  margin-top: 0.75rem;
-  margin-bottom: 0.75rem;
-}
 .my-4 {
   margin-top: 1rem;
   margin-bottom: 1rem;
@@ -706,12 +702,6 @@ video {
 .h-full {
   height: 100%;
 }
-.h-\[\] {
-  height: ;
-}
-.h-\[80\%\] {
-  height: 80%;
-}
 .w-1\/2 {
   width: 50%;
 }
@@ -768,18 +758,6 @@ video {
 }
 .flex-1 {
   flex: 1 1 0%;
-}
-.flex-\[\] {
-  flex: ;
-}
-.flex-\[40\%\] {
-  flex: 40%;
-}
-.flex-\[\%\] {
-  flex: %;
-}
-.flex-\[1\/2\] {
-  flex: 1/2;
 }
 .shrink-0 {
   flex-shrink: 0;
@@ -1018,14 +996,6 @@ video {
   padding-top: 2.25rem;
   padding-bottom: 2.25rem;
 }
-.px-5 {
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
-}
-.px-6 {
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-}
 .pt-0 {
   padding-top: 0px;
 }
@@ -1036,9 +1006,8 @@ video {
   font-size: 1.5rem;
   line-height: 2rem;
 }
-.text-4xl {
-  font-size: 2.25rem;
-  line-height: 2.5rem;
+.text-\[13px\] {
+  font-size: 13px;
 }
 .text-lg {
   font-size: 1.125rem;
@@ -1055,16 +1024,6 @@ video {
 .text-xs {
   font-size: 0.75rem;
   line-height: 1rem;
-}
-.text-\[12px\] {
-  font-size: 12px;
-}
-.text-\[13px\] {
-  font-size: 13px;
-}
-.text-5xl {
-  font-size: 3rem;
-  line-height: 1;
 }
 .font-bold {
   font-weight: 700;
@@ -1084,16 +1043,9 @@ video {
 .tracking-tight {
   letter-spacing: -0.025em;
 }
-.tracking-wide {
-  letter-spacing: 0.025em;
-}
 .text-blue-500 {
   --tw-text-opacity: 1;
   color: rgb(59 130 246 / var(--tw-text-opacity));
-}
-.text-blue-600 {
-  --tw-text-opacity: 1;
-  color: rgb(37 99 235 / var(--tw-text-opacity));
 }
 .text-card-foreground {
   color: hsl(var(--card-foreground));
@@ -1149,9 +1101,6 @@ video {
 }
 .text-secondary-foreground {
   color: hsl(var(--secondary-foreground));
-}
-.text-\[\] {
-  color: ;
 }
 .underline-offset-4 {
   text-underline-offset: 4px;
@@ -1554,12 +1503,12 @@ body{
     display: block;
   }
 
-  .sm\:w-\[26vw\] {
-    width: 26vw;
-  }
-
   .sm\:max-w-\[425px\] {
     max-width: 425px;
+  }
+
+  .sm\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .sm\:flex-row {
@@ -1589,6 +1538,10 @@ body{
 
   .md\:block {
     display: block;
+  }
+
+  .md\:w-\[26vw\] {
+    width: 26vw;
   }
 
   .md\:grid-cols-3 {
