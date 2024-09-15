@@ -6,7 +6,8 @@ export default defineSchema({
         username: v.string(),
         imageUrl: v.string(),
         clerkId: v.string(),
-        email: v.string()
+        email: v.string(),
+        content: v.boolean(),
     })
     .index("by_email", ["email"])
     .index("by_username", ["username"]) 

@@ -13,17 +13,19 @@ import { ConvexError } from 'convex/values';
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
+import { Switch } from '@/components/ui/switch';
 
 interface EditButtonProps {
     link?: {
-        _id: Id<"links">; url: string; note?: string 
-};
+        _id: Id<"links">; url: string; note?: string; privacy?: boolean
+    };
     onClose: () => void;
 }
 
 const linkSchema = z.object({
     url: z.string().url("Invalid URL").nonempty("URL is required"),
     note: z.string().optional(),
+    privacy: z.boolean()
 });
 
 const EditButton: React.FunctionComponent<EditButtonProps> = ({ link, onClose }) => {
@@ -35,6 +37,7 @@ const EditButton: React.FunctionComponent<EditButtonProps> = ({ link, onClose })
         defaultValues: {
             url: link?.url || "",
             note: link?.note || "",
+            privacy: link?.privacy 
         },
     });
 
@@ -43,7 +46,7 @@ const EditButton: React.FunctionComponent<EditButtonProps> = ({ link, onClose })
     const onSubmit = async (values: z.infer<typeof linkSchema>) => {
         try {
             if (editingLink) {
-                await updateLink({ id: editingLink._id, url: values.url, note: values.note ?? '' });
+                await updateLink({ id: editingLink._id, url: values.url, note: values.note ?? '', privacy: values.privacy });
                 toast.success("Link updated successfully");
             } else {
                 toast.success("Link added successfully");
@@ -106,6 +109,27 @@ const EditButton: React.FunctionComponent<EditButtonProps> = ({ link, onClose })
                                     <FormMessage>
                                         {errors.note && <p className="text-red-500">{errors.note.message}</p>}
                                     </FormMessage>
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="privacy"
+                            render={({ field }) => (
+                                <FormItem className="flex items-center gap-4">
+                                    <FormControl className="flex items-center">
+                                        <Switch
+                                            id="privacy"
+                                            checked={field.value}
+                                            onCheckedChange={field.onChange}
+                                        />
+                                    </FormControl>
+                                    <FormLabel
+                                        className={`flex items-center ${!field.value ? 'text-red-600' : 'text-green-700'}`}
+                                        style={{ margin: 0 }}
+                                    >
+                                        {field.value ? 'Public' : 'Private'}
+                                    </FormLabel>
                                 </FormItem>
                             )}
                         />

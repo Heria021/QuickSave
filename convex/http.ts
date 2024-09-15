@@ -48,6 +48,7 @@ const handleClerkWebhook = httpAction(async (ctx, req) => {
                 clerkId: event.data.id,
                 email: event.data.email_addresses[0].
                 email_address,
+                content: false
             });
 
             break;

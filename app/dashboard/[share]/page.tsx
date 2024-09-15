@@ -38,8 +38,8 @@ const Page = ({ params: { share } }: Props) => {
   return (
     <div className="p-4">
       {!publinks || publinks.length === 0 ? (
-        <div>
-          <p>No Links</p>
+        <div className=' flex items-center justify-center w-full h-[80vh]'>
+          <p>Empty Collection</p>
         </div>
       ) : (
         <div className={`grid gap-4 grid-cols-1 md:grid-cols-3 ${value ? 'lg:grid-cols-4' : 'lg:grid-cols-5'}`}>

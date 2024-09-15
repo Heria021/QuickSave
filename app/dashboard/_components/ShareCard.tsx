@@ -1,15 +1,15 @@
 // components/LinkCard.tsx
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
-import { CopyPlus, Trash2 } from 'lucide-react';
+import { CopyPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Id } from '@/convex/_generated/dataModel';
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import AnalyzeDialog from './Analyze';
 import { Badge } from '@/components/ui/badge';
+import { useState } from 'react';
 import { toast } from 'sonner';
-import { ConvexError } from 'convex/values';
 
 interface Link {
     _id: Id<"links">;
@@ -27,7 +27,31 @@ interface LinkCardProps {
 }
 
 const ShareCard = ({ link }: LinkCardProps) => {
-    const removeLink = useMutation(api.linkSaver.remove);
+    const [loading, setLoading] = useState(false);
+    const createRequest = useMutation(api.linkSaver.create);
+
+    const handleAddCard = async () => {
+        setLoading(true);
+        try {
+            const completeData = {
+                url: link.url,
+                note: link.note || '',
+                pageurl: link.pageurl || link.url,
+                imageUrl: link.imageUrl || "http://www.gspireproductions.com/images/photo-yellow-light.png",
+                title: link.title || 'Title',
+                siteName: link.siteName || link.url,
+                privacy: link.privacy,
+            };
+            
+            await createRequest(completeData);
+            toast.success("Link added successfully");
+        } catch (error: any) {
+            console.error(error);
+            toast.error(error?.data || "Unexpected error occurred");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <Card className="p-4 border rounded shadow hover:shadow-lg">
@@ -51,10 +75,11 @@ const ShareCard = ({ link }: LinkCardProps) => {
 
                 <div className="flex items-center justify-between my-2">
                     <div className="flex items-center justify-start gap-3">
-
                         <Button
                             size={'icon'}
                             className="h-7 w-7"
+                            onClick={handleAddCard}
+                            disabled={loading}
                         >
                             <CopyPlus size={17} />
                         </Button>

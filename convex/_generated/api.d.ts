@@ -16,6 +16,7 @@ import type {
 } from "convex/server";
 import type * as ShareCollection from "../ShareCollection.js";
 import type * as ShareLinks from "../ShareLinks.js";
+import type * as contentUpdate from "../contentUpdate.js";
 import type * as http from "../http.js";
 import type * as linkSaver from "../linkSaver.js";
 import type * as user from "../user.js";
@@ -33,6 +34,7 @@ import type * as utils from "../utils.js";
 declare const fullApi: ApiFromModules<{
   ShareCollection: typeof ShareCollection;
   ShareLinks: typeof ShareLinks;
+  contentUpdate: typeof contentUpdate;
   http: typeof http;
   linkSaver: typeof linkSaver;
   user: typeof user;

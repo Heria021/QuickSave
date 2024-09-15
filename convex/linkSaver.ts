@@ -93,6 +93,7 @@ export const update = mutation({
         id: v.id("links"),
         url: v.string(),
         note: v.string(),
+        privacy: v.boolean()
     },
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
@@ -117,6 +118,7 @@ export const update = mutation({
         const updatedLink = await ctx.db.patch(args.id, {
             url: args.url,
             note: args.note || "",
+            privacy: args.privacy
         });
 
         return updatedLink;

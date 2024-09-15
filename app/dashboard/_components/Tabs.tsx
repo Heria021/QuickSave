@@ -128,7 +128,7 @@ export function TabSection() {
   }
 
   return (
-    <Tabs defaultValue="share-section" className="w-full px-4 h-full">
+    <Tabs defaultValue="add-section" className="w-full px-4 h-full">
       <TabsList className="grid w-full grid-cols-2">
         <TabsTrigger value="add-section">Added</TabsTrigger>
         <TabsTrigger value="share-section">Shared</TabsTrigger>
@@ -204,14 +204,14 @@ export function TabSection() {
           <CardContent className="space-y-2 flex-grow">
             {addedUsers.length === 0
               ?
-              <div className="w-full h-full flex items-center justify-center ">
+              <div className="w-full h-full flex items-center justify-center gap-2">
                 <p>Empty</p>
               </div>
               :
               <>
                 {addedUsers.map((user) => (
                   <Link href={`/dashboard/${user.addedId}`} key={user._id} onClick={()=>{window.innerWidth <= 640 && setValue(false)}}>
-                    <div className="border border-border rounded-md p-2 shadow-sm flex items-center justify-between truncate cursor-pointer">
+                    <div className="border border-border rounded-md p-2 mb-2 shadow-sm flex items-center justify-between truncate cursor-pointer">
                       <div className="flex items-center gap-4 truncate">
                         <Avatar className='w-10 h-10 overflow-hidden rounded-full'>
                           <AvatarImage src={user.imageUrl} className='h-full w-full object-cover' />

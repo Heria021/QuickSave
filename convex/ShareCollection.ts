@@ -34,6 +34,39 @@ export const createShare = mutation({
     },
 });
 
+export const createMember = mutation({
+    args: {
+        s_email: v.string(),
+    },
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+
+        if (!identity) {
+            throw new ConvexError("Unauthorized");
+        }
+
+        if (!identity.email || !args.s_email) {
+            throw new ConvexError("Sender and receiver emails are required");
+        }
+        const existingShare = await ctx.db.query("Share")
+            .withIndex("receiver_sender_email", (q) =>
+                q.eq("s_email", args.s_email).eq("r_email", identity.email || '')
+            )
+            .unique();
+
+        if (existingShare) {
+            throw new ConvexError("Share entry already exists");
+        }
+
+        const newShare = await ctx.db.insert("Share", {
+            r_email: identity.email,
+            s_email: args.s_email,
+        });
+
+        return newShare;
+    },
+});
+
 
 export const getShares = query(async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();

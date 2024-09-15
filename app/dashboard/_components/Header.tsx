@@ -3,11 +3,13 @@ import { Card } from '@/components/ui/card'
 import { UserButton, useUser } from '@clerk/nextjs'
 import React from 'react'
 import AddLink from './AddButton';
-import { BellRing } from 'lucide-react';
+import { BellRing, Bike, Settings2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import Permissions from './Permissions';
 import SideBarToggle from './SideBarToggel';
+import Preference from './Preference';
+import Link from 'next/link';
 
 
 function Header() {
@@ -16,11 +18,13 @@ function Header() {
     return (
         <div className="p-4">
             <div className="">
-                <Card className="flex items-center justify-between p-4">
+                <Card className="flex items-center justify-between py-2 px-4">
                     <div className="hidden sm:block">
-                        <h1 className="text-4xl font-semibold tracking-wide text-gray-900">
-                            <span className="text-blue-600">Quick</span><span className="text-gray-900">Save</span>
-                        </h1>
+                        <Link href={'/dashboard'}>
+                            <h1 className="text-gray-900">
+                                <Bike size={56} strokeWidth={1.8}></Bike>
+                            </h1>
+                        </Link>
                     </div>
                     <div className="">
                         <div className="rounded-md flex items-center gap-3">
@@ -38,7 +42,7 @@ function Header() {
                             </Tooltip>
                             <Tooltip>
                                 <TooltipTrigger>
-                                    <SideBarToggle/>
+                                    <SideBarToggle />
                                 </TooltipTrigger>
                             </Tooltip>
                             <Tooltip>
@@ -66,7 +70,22 @@ function Header() {
                                             elements: {
                                                 userButtonAvatarBox: "w-[34px] h-[34px]",
                                             }
-                                        }} />
+                                        }} >
+                                            <UserButton.MenuItems>
+                                                <UserButton.Action label="Preferences" labelIcon={<Settings2 size={16} />} open="settings" />
+                                            </UserButton.MenuItems>
+
+                                            <UserButton.UserProfilePage label="Preferences" labelIcon={<Settings2 size={16} />} url="settings">
+                                                <div>
+                                                    <div>
+                                                        <p className='font-bold mb-4'>Preference</p>
+                                                    </div>
+                                                    <hr className='my-4' />
+                                                    <Preference />
+                                                </div>
+                                            </UserButton.UserProfilePage>
+
+                                        </UserButton>
                                     </TooltipTrigger>
                                     <TooltipContent>Account</TooltipContent>
                                 </Tooltip>

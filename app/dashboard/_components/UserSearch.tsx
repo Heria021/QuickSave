@@ -9,9 +9,9 @@ import { Input } from '@/components/ui/input';
 import { Form, FormItem, FormLabel, FormControl } from '@/components/ui/form';
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
-import { useConvex } from 'convex/react';
+import { useConvex, useQuery } from 'convex/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Plus, User } from 'lucide-react';
+import { Plus, User, UsersRound } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { useMutationState } from '@/hooks/useMutationState';
@@ -35,7 +35,7 @@ interface User {
 
 export function UserSearch() {
   const { mutate: createShare, pending } = useMutationState(api.ShareCollection.createShare);
-
+  const { mutate: createMember } = useMutationState(api.ShareCollection.createMember);
   const form = useForm<SearchFormValues>({
     resolver: zodResolver(searchSchema),
     defaultValues: {
@@ -46,6 +46,7 @@ export function UserSearch() {
   const { control, watch } = form;
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
+  const [userStatus, setUserStatus] = useState<{ [key: string]: boolean }>({});
   const searchTerm = watch('searchTerm');
   const convex = useConvex();
 
@@ -62,11 +63,20 @@ export function UserSearch() {
         const result = await convex.query(api.userSearch.userSearch, { searchString: searchTerm });
         setUsers(result ?? []);
         console.log(result);
+
+        // Fetch user email status
+        const userStatuses = await Promise.all(
+          result.map(async (user: User) => {
+            const contentStatus = await convex.query(api.contentUpdate.getContent, { email: user.email });
+            return { [user.email]: contentStatus?.content || false };
+          })
+        );
+
+        setUserStatus(Object.assign({}, ...userStatuses));
       } catch (error) {
         console.error("Error fetching users:", error);
       } finally {
-        if (searchTerm)
-          setLoading(false);
+        setLoading(false);
       }
     };
 
@@ -76,6 +86,16 @@ export function UserSearch() {
   const handleShare = async (r_email: string) => {
     try {
       await createShare({ r_email });
+      toast.success("Collection shared successfully");
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error instanceof ConvexError ? error.data : "Unexpected error occurred");
+    }
+  };
+
+  const handleMember = async (s_email: string) => {
+    try {
+      await createMember({ s_email });
       toast.success("Collection shared successfully");
     } catch (error: any) {
       console.log(error);
@@ -136,11 +156,20 @@ export function UserSearch() {
                 </div>
               </div>
               <div className="">
-                <Button onClick={() => handleShare(user.email)} className='h-8 w-8' variant={'outline'}>
-                  <div className="flex items-center justify-center">
-                    <Plus size={18} />
-                  </div>
-                </Button>
+                {
+                  userStatus[user.email] ?
+                    <Button onClick={() => handleMember(user.email)} className='h-8 w-8' variant={'outline'}>
+                      <div className="flex items-center justify-center">
+                        <UsersRound size={18} /> 
+                      </div>
+                    </Button>
+                    :
+                    <Button onClick={() => handleShare(user.email)} className='h-8 w-8' variant={'outline'}>
+                      <div className="flex items-center justify-center">
+                        <Plus size={18} />
+                      </div>
+                    </Button>
+                }
               </div>
             </div>
           ))
