@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Form, FormItem, FormLabel, FormControl } from '@/components/ui/form';
 import { api } from '@/convex/_generated/api';
@@ -158,11 +157,18 @@ export function UserSearch() {
               <div className="">
                 {
                   userStatus[user.email] ?
-                    <Button onClick={() => handleMember(user.email)} className='h-8 w-8' variant={'outline'}>
-                      <div className="flex items-center justify-center">
-                        <UsersRound size={18} /> 
-                      </div>
-                    </Button>
+                    <div className="flex justify-center items-center gap-2">
+                      <Button onClick={() => handleMember(user.email)} className='h-8 w-8' variant={'outline'}>
+                        <div className="flex items-center justify-center">
+                          <UsersRound size={18} />
+                        </div>
+                      </Button>
+                      <Button onClick={() => handleShare(user.email)} className='h-8 w-8' variant={'outline'}>
+                        <div className="flex items-center justify-center">
+                          <Plus size={18} />
+                        </div>
+                      </Button>
+                    </div>
                     :
                     <Button onClick={() => handleShare(user.email)} className='h-8 w-8' variant={'outline'}>
                       <div className="flex items-center justify-center">
