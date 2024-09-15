@@ -21,7 +21,7 @@ function Header() {
                 <Card className="flex items-center justify-between py-2 px-4">
                     <div className="hidden sm:block">
                         <Link href={'/dashboard'}>
-                            <h1 className="text-gray-900">
+                            <h1 className=" text-foreground ">
                                 <Bike size={56} strokeWidth={1.8}></Bike>
                             </h1>
                         </Link>
