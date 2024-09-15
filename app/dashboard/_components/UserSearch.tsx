@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { useMutationState } from '@/hooks/useMutationState';
 import { toast } from 'sonner';
 import { ConvexError } from 'convex/values';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 const searchSchema = z.object({
   searchTerm: z.string().min(1, "Search term is required"),
@@ -158,23 +159,38 @@ export function UserSearch() {
                 {
                   userStatus[user.email] ?
                     <div className="flex justify-center items-center gap-2">
-                      <Button onClick={() => handleMember(user.email)} className='h-8 w-8' variant={'outline'}>
-                        <div className="flex items-center justify-center">
-                          <UsersRound size={18} />
-                        </div>
-                      </Button>
-                      <Button onClick={() => handleShare(user.email)} className='h-8 w-8' variant={'outline'}>
-                        <div className="flex items-center justify-center">
-                          <Plus size={18} />
-                        </div>
-                      </Button>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Button onClick={() => handleMember(user.email)} className='h-8 w-8' variant={'outline'}>
+                            <div className="flex items-center justify-center">
+                              <UsersRound size={18} />
+                            </div>
+                          </Button>
+                          <TooltipContent>Join Group</TooltipContent>
+                        </TooltipTrigger>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <Button onClick={() => handleShare(user.email)} className='h-8 w-8' variant={'outline'}>
+                            <div className="flex items-center justify-center">
+                              <Plus size={18} />
+                            </div>
+                          </Button>
+                          <TooltipContent>Add</TooltipContent>
+                        </TooltipTrigger>
+                      </Tooltip>
                     </div>
                     :
-                    <Button onClick={() => handleShare(user.email)} className='h-8 w-8' variant={'outline'}>
-                      <div className="flex items-center justify-center">
-                        <Plus size={18} />
-                      </div>
-                    </Button>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Button onClick={() => handleShare(user.email)} className='h-8 w-8' variant={'outline'}>
+                          <div className="flex items-center justify-center">
+                            <Plus size={18} />
+                          </div>
+                        </Button>
+                        <TooltipContent>Add</TooltipContent>
+                      </TooltipTrigger>
+                    </Tooltip>
                 }
               </div>
             </div>
