@@ -41,7 +41,7 @@ const Preference = () => {
                         control={control}
                         render={({ field }) => (
                             <FormItem className="flex items-center justify-between">
-                                <div className="font-medium text-[13px]">Password</div>
+                                <div className="font-medium text-[13px]">Privacy Mode</div>
                                 <div className="flex gap-4">
                                     <FormControl className="flex items-center">
                                         <Switch
